@@ -37,37 +37,39 @@
 		file_put_contents("./".$thumb_id.".jpg",
 			@file_get_contents($poster));
 		$file_contents = realpath('./'.$thumb_id.'.jpg');
-		if (filesize($file_contents) == 0) continue;
+		if (filesize($file_contents) > 0){
 
-		// post it to the server
-		$ch = curl_init();
+			// post it to the server
+			$ch = curl_init();
 
-		$url = "http://sachawheeler.com/home/plexdata.php";
-		$fields = array(
-				'title' => urlencode($title),
-				'id' => $thumb_id,
-				'count' => $count,
-				'viewed' => $viewed,
-				'file_contents' => '@'.$file_contents
-				);
-		foreach($fields as $key=>$value)
-			$fields_string .= $key.'='.$value.'&';
-		rtrim($fields_string, '&');
+			$url = "http://sachawheeler.com/home/plexdata.php";
+			$fields = array(
+					'title' => urlencode($title),
+					'id' => $thumb_id,
+					'count' => $count,
+					'viewed' => $viewed,
+					'file_contents' => '@'.$file_contents
+					);
+			foreach($fields as $key=>$value)
+				$fields_string .= $key.'='.$value.'&';
+			rtrim($fields_string, '&');
 
-		//set the url, number of POST vars, POST data
-		curl_setopt($ch,CURLOPT_URL, $url);
-		curl_setopt($ch,CURLOPT_POST, 1);
-		curl_setopt($ch,CURLOPT_POSTFIELDS, $fields);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+			//set the url, number of POST vars, POST data
+			curl_setopt($ch,CURLOPT_URL, $url);
+			curl_setopt($ch,CURLOPT_POST, 1);
+			curl_setopt($ch,CURLOPT_POSTFIELDS, $fields);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
 
-		//execute post
-		$result = curl_exec($ch);
-
-		//close connection
-		curl_close($ch);
-		unlink("./".$thumb_id.".jpg");
-		$count++;
-		if($count == 4) break;
-	}
-
+			//execute post
+			$result = curl_exec($ch);
+	
+			//close connection
+			curl_close($ch);
+			unlink("./".$thumb_id.".jpg");
+			$count++;
+			if($count == 4) break;
+		}else{
+			unlink($file_contents);
+		}
+}
  ?>
