@@ -12,6 +12,7 @@
 		exit(0);
 	else
 		file_put_contents($lock_file, $latest);
+
 	$count = 0;
 	$already_seen = array();
 	foreach($data as $row){
