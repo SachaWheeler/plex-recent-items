@@ -16,6 +16,7 @@
 	$count = 0;
 	$already_seen = array();
 	foreach($data as $row){
+		print_r($row);
 		if(isset($row['grandparentTitle']) && isset($row['grandparentThumb'])){
 			$thumb = $row['grandparentThumb'];
 			$title = $row['grandparentTitle'];
