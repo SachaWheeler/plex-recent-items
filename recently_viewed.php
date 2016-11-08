@@ -14,6 +14,7 @@
 		file_put_contents($lock_file, $latest);
 
 	$count = 0;
+	$width = 200;
 	$already_seen = array();
 	foreach($data as $row){
 		print_r($row);
@@ -36,15 +37,24 @@
 			continue;
 		$already_seen[] = $thumb_id;
 		$poster = "http://127.0.0.1:32400".$thumb ."?X-Plex-Token=".$token;
-		file_put_contents("./".$thumb_id.".jpg",
-			@file_get_contents($poster));
-		$file_contents = realpath('./'.$thumb_id.'.jpg');
+		$image = imagecreatefromstring(file_get_contents($poster));
+		imagepng($image, './'.$thumb_id.'.png', 9);
+
+		list($width_orig, $height_orig) = getimagesize('./'.$thumb_id.'.png');
+		$ratio_orig = $width_orig/$height_orig;
+		$height = $width/$ratio_orig;
+		$image_p = imagecreatetruecolor($width, $height);
+		$image = imagecreatefrompng('./'.$thumb_id.'.png');
+		imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
+		imagepng($image_p, './'.$thumb_id.'_t.png', 9);
+
+		$file_contents = realpath('./'.$thumb_id.'_t.png');
 		if (filesize($file_contents) > 0){
 
 			// post it to the server
 			$ch = curl_init();
 
-			$url = "http://sachawheeler.com/home/plexdata.php";
+			$url = "https://sachawheeler.com/home/plexdata.php";
 			$fields = array(
 					'title' => urlencode($title),
 					'id' => $thumb_id,
@@ -67,7 +77,7 @@
 	
 			//close connection
 			curl_close($ch);
-			unlink("./".$thumb_id.".jpg");
+			unlink("./".$thumb_id.".png");
 			$count++;
 			if($count == 4) break;
 		}else{
