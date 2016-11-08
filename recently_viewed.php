@@ -14,7 +14,7 @@
 		file_put_contents($lock_file, $latest);
 
 	$count = 0;
-	$width = 200;
+	$width = 300;
 	$already_seen = array();
 	foreach($data as $row){
 		print_r($row);
