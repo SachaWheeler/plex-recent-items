@@ -78,6 +78,7 @@
 			//close connection
 			curl_close($ch);
 			unlink("./".$thumb_id.".png");
+			unlink("./".$thumb_id."_t.png");
 			$count++;
 			if($count == 4) break;
 		}else{
