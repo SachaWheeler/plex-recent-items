@@ -1,7 +1,8 @@
 <?php
 
 	// get the data
-	$token = "43u79eEyGPG15hq5nZ6p";
+	//$token = "43u79eEyGPG15hq5nZ6p";
+        $token = "xKzuAdqrTpyQxGyHpdGe";
 	$url = "http://localhost:32400/status/sessions/history/all"."?X-Plex-Token=".$token;
 	$data = new SimpleXMLElement(file_get_contents($url));
 	$latest = (string)$data->Video[0]['viewedAt'];
@@ -17,7 +18,7 @@
 	$width = 300;
 	$already_seen = array();
 	foreach($data as $row){
-		print_r($row);
+		//print_r($row);
 		if(isset($row['grandparentTitle']) && isset($row['grandparentThumb'])){
 			$thumb = $row['grandparentThumb'];
 			$title = $row['grandparentTitle'];
@@ -37,6 +38,8 @@
 			continue;
 		$already_seen[] = $thumb_id;
 		$poster = "http://127.0.0.1:32400".$thumb ."?X-Plex-Token=".$token;
+//print($poster);
+//print "\n";
 		$image = imagecreatefromstring(file_get_contents($poster));
 		imagepng($image, './'.$thumb_id.'.png', 9);
 
@@ -50,7 +53,7 @@
 
 		$file_contents = realpath('./'.$thumb_id.'_t.png');
 		if (filesize($file_contents) > 0){
-
+			//print "posting\n";
 			// post it to the server
 			$ch = curl_init();
 
@@ -60,20 +63,24 @@
 					'id' => $thumb_id,
 					'count' => $count,
 					'viewed' => $viewed,
-					'file_contents' => '@'.$file_contents
+					//'file_contents' => '@'.$file_contents
+					'file_contents' => curl_file_create($file_contents)
 					);
-			foreach($fields as $key=>$value)
-				$fields_string .= $key.'='.$value.'&';
-			rtrim($fields_string, '&');
+//print "url: ";
+//print_r($url);
+//print "fields: ";
+//print_r($fields);
 
 			//set the url, number of POST vars, POST data
 			curl_setopt($ch,CURLOPT_URL, $url);
 			curl_setopt($ch,CURLOPT_POST, 1);
 			curl_setopt($ch,CURLOPT_POSTFIELDS, $fields);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+			curl_setopt($ch, CURLOPT_SAFE_UPLOAD, false);
 
 			//execute post
 			$result = curl_exec($ch);
+//print_r($result);
 	
 			//close connection
 			curl_close($ch);
